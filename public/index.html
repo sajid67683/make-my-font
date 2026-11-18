@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Make My Font</title>
+  <meta name="description" content="Turn your handwriting into a real, installable TTF font. Print a template, write, snap a photo, download your font." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231d3fd1'/><text x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='white'>Aa</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Free · runs in your browser + a tiny server</p>
+      <h1>Turn your handwriting<br />into a real font.</h1>
+      <p class="lede">Print the template, fill it in with a pen, take a photo. We find the corner markers, straighten the page, trace every letter into smooth curves, and hand you a <strong>.ttf</strong> you can install anywhere.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- STEP 1 -->
+    <section class="step" id="step-template">
+      <div class="step-head">
+        <span class="num">1</span>
+        <div>
+          <h2>Print the template</h2>
+          <p>Two A4 pages covering all 94 printable ASCII characters. Page 1 alone (capitals, digits, basic punctuation) is enough to get started.</p>
+        </div>
+      </div>
+      <div class="template-row">
+        <a class="thumb" href="/api/template/1.png" target="_blank" rel="noopener">
+          <img src="/api/template/1.png" alt="Template page 1: capitals, digits, punctuation" loading="lazy" />
+          <span>Page 1 · A–Z 0–9 . , ! ?</span>
+        </a>
+        <a class="thumb" href="/api/template/2.png" target="_blank" rel="noopener">
+          <img src="/api/template/2.png" alt="Template page 2: lowercase and symbols" loading="lazy" />
+          <span>Page 2 · a–z @ # $ % …</span>
+        </a>
+        <div class="template-actions">
+          <a class="btn primary" href="/api/template.pdf" download>Download PDF template</a>
+          <ul class="tips">
+            <li>Print at any size; the corner squares handle scaling.</li>
+            <li>Use a <b>black felt-tip or gel pen</b>. Pencil is too faint.</li>
+            <li>Sit letters on the <span class="blue">blue baseline</span>; g j p q y hang below it.</li>
+            <li>Leave a box empty to skip that character.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step-upload">
+      <div class="step-head">
+        <span class="num">2</span>
+        <div>
+          <h2>Upload photos or scans</h2>
+          <p>Shoot from straight above in even light, with all four black corner squares visible. Pages are recognised automatically, in any order.</p>
+        </div>
+      </div>
+      <label class="drop" id="drop">
+        <input type="file" id="file-input" accept="image/*" multiple hidden />
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span><b>Drop images here</b> or click to choose</span>
+        <small>JPG or PNG · up to 6 images</small>
+      </label>
+      <ul class="files" id="file-list"></ul>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step-generate">
+      <div class="step-head">
+        <span class="num">3</span>
+        <div>
+          <h2>Name it and generate</h2>
+          <p>Defaults work for most photos. Tweak and regenerate as often as you like; your photos stay loaded.</p>
+        </div>
+      </div>
+      <form id="settings" class="settings" autocomplete="off">
+        <label class="field wide">
+          <span>Font name</span>
+          <input type="text" name="family" id="family" maxlength="48" value="My Handwriting" />
+        </label>
+        <label class="field">
+          <span>Ink sensitivity <output id="o-threshold">0.60</output></span>
+          <input type="range" name="threshold" min="0.35" max="0.85" step="0.01" value="0.6" data-out="o-threshold" data-fixed="2" />
+          <small>Raise it for faint pens, lower it if the guide lines show up.</small>
+        </label>
+        <label class="field">
+          <span>Stroke weight <output id="o-weight">0</output></span>
+          <input type="range" name="weight" min="-3" max="3" step="1" value="0" data-out="o-weight" />
+          <small>Thin or thicken every stroke.</small>
+        </label>
+        <label class="field">
+          <span>Letter spacing <output id="o-spacing">40</output></span>
+          <input type="range" name="spacing" min="-40" max="160" step="5" value="40" data-out="o-spacing" />
+          <small>Space on each side of a letter (font units).</small>
+        </label>
+        <div class="field toggles">
+          <label class="check"><input type="checkbox" name="normalize" checked /> Even out letter size</label>
+          <label class="check"><input type="checkbox" name="fill_case" checked /> Fill blank letters from the other case</label>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn primary big" id="generate" disabled>
+            <span class="label">Generate my font</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+          <p class="status" id="status" role="status"></p>
+        </div>
+      </form>
+    </section>
+
+    <!-- RESULT -->
+    <section class="step result" id="result" hidden>
+      <div class="step-head">
+        <span class="num done">✓</span>
+        <div>
+          <h2 id="result-title">Your font is ready</h2>
+          <p id="result-summary"></p>
+        </div>
+        <a class="btn primary" id="download" download>Download .ttf</a>
+      </div>
+
+      <div class="preview-card">
+        <div class="preview-tools">
+          <label>Size <input type="range" id="preview-size" min="20" max="120" value="56" /></label>
+        </div>
+        <div class="preview-text" id="preview-text" contenteditable="true" spellcheck="false">The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs! 0123456789</div>
+      </div>
+
+      <h3>Character set</h3>
+      <div class="charset" id="charset"></div>
+      <p class="legend"><span class="sw ok"></span> traced <span class="sw borrowed"></span> borrowed from other case <span class="sw missing"></span> missing</p>
+
+      <h3>What we saw</h3>
+      <div class="sheets" id="sheets"></div>
+
+      <details class="install">
+        <summary>How to install the font</summary>
+        <ul>
+          <li><b>Windows:</b> right-click the .ttf → <i>Install</i>.</li>
+          <li><b>macOS:</b> double-click the .ttf → <i>Install Font</i>.</li>
+          <li><b>iPhone / iPad:</b> use a font installer app, or upload to apps that accept custom fonts.</li>
+          <li><b>Web:</b> <code>@font-face { font-family: "My Hand"; src: url(myhand.ttf); }</code></li>
+          <li>Regenerating with the same name? Uninstall the old one first, or give it a new name.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    Made with OpenCV, potrace and fontTools. Your photos are processed once and never stored.
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

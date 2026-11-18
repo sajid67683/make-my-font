@@ -1,0 +1,6 @@
+flask>=3.0
+numpy>=1.26
+opencv-python-headless>=4.8,<5  # 4.x: same ArUco API, smaller bundle than 5.x
+fonttools>=4.47
+potracer>=0.0.4
+pillow>=10.1
